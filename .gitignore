@@ -1,0 +1,6 @@
+.coverage
+.tox
+MANIFEST
+__pycache__
+dist
+*.pyc
