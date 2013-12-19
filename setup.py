@@ -1,10 +1,15 @@
+import os
+
 from distutils.core import setup
+
+curdir = os.path.dirname(__file__)
+readme = os.path.join(curdir, 'README.rst')
 
 setup(
     name='sql',
-    version='0.1.1',
+    version='0.2.0',
     description='DB API 2.0 for Humans',
-    long_description=open('README.rst').read(),
+    long_description=open(readme).read(),
     author='Eugene Van den Bulke',
     author_email='eugene.vandenbulke@gmail.com',
     url='http://github.com/3kwa/sql',

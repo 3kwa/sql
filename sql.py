@@ -54,7 +54,11 @@ class SQL(object):
         """
         if len(cursor.description) > 1:
             fields = [description[0] for description in cursor.description]
-            return namedtuple('Record', fields)
+            try:
+                return namedtuple('Record', fields)
+            except ValueError as e:
+                expression = e.args[0].split(':').pop().strip()
+                raise SQLException('Missing AS for %s', expression)
 
     @staticmethod
     def which_execute(parameters_or_seq):
@@ -71,3 +75,6 @@ class SQL(object):
             if any(type(parameters_or_seq[0]) == type_ for type_ in types_many):
                 return 'executemany'
             return 'execute'
+
+class SQLException(Exception):
+    pass

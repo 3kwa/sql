@@ -67,6 +67,12 @@ def test_run(connection):
     with pytest.raises(sqlite3.OperationalError):
         sql_.one("SELECT COUNT(*) FROM test")
 
+def test_missing_as_raise_explicit_exception(connection):
+    sql_ = sql.SQL(connection)
+    with pytest.raises(sql.SQLException) as excinfo:
+        sql_.one("SELECT a, LENGTH(c) FROM test")
+    assert excinfo.value.args == ("Missing AS for %s", "'LENGTH(c)'")
+
 def test_parameterized_run_one(connection):
     sql_ = sql.SQL(connection)
     sql_.run("INSERT INTO test VALUES (:a, :b, :c)",
