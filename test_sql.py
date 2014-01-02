@@ -12,9 +12,9 @@ def connection():
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE test (a, b , c)")
     cursor.executemany("INSERT INTO test VALUES (?, ?, ?)",
-                   (('A', 1, '101'),
-                    ('B', 2, '202'),
-                    ('C', 3, '303')))
+                       (('A', 1, '101'),
+                        ('B', 2, '202'),
+                        ('C', 3, '303')))
     cursor.close()
     return connection
 

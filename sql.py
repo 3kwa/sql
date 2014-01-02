@@ -17,35 +17,44 @@ class SQL(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def one(self, query, parameters=list()):
+    def one(self, query, parameters=None):
         """
         fetchone returning scalar or namedtuple
         """
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, parameters)
+            if parameters:
+                cursor.execute(query, parameters)
+            else:
+                cursor.execute(query)
             Record = self.make_record(cursor)
             if Record is None:
                 return cursor.fetchone()[0]
             return Record(*cursor.fetchone())
 
-    def all(self, query, parameters=list()):
+    def all(self, query, parameters=None):
         """
         fetchall returning list of scalars or namedtuples
         """
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, parameters)
+            if parameters:
+                cursor.execute(query, parameters)
+            else:
+                cursor.execute(query)
             Record = self.make_record(cursor)
             if Record is None:
                 return [record[0] for record in cursor.fetchall()]
             return [Record(*record) for record in cursor.fetchall()]
 
-    def run(self, query, parameters=list()):
+    def run(self, query, parameters=None):
         """
         execute or executemany depending on parameters
         """
         with closing(self.connection.cursor()) as cursor:
             execute = getattr(cursor, self.which_execute(parameters))
-            execute(query, parameters)
+            if parameters:
+                execute(query, parameters)
+            else:
+                execute(query)
 
     @staticmethod
     def make_record(cursor):
