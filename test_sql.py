@@ -22,6 +22,14 @@ def test_one_column_select_one(connection):
     sql_ = sql.SQL(connection)
     assert sql_.one("SELECT SUM(b) FROM test") == 6
 
+def test_one_no_result(connection):
+    sql_ = sql.SQL(connection)
+    assert sql_.one("SELECT a FROM test WHERE b=4") is None
+
+def test_one_multi_no_result(connection):
+    sql_ = sql.SQL(connection)
+    assert sql_.one("SELECT a, b FROM test WHERE b=4") is None
+
 def test_parameterized_one(connection):
     sql_ = sql.SQL(connection)
     assert sql_.one("SELECT SUM(b) FROM test WHERE c != ?", ['202']) == 4
@@ -53,6 +61,15 @@ def test_many_column_select_many(connection):
     records = sql_.all("SELECT b, c FROM test ORDER BY a DESC")
     record = records[0]
     assert (record.b, record.c) == (3, '303')
+
+def test_all_no_result(connection):
+    sql_ = sql.SQL(connection)
+    assert sql_.all("SELECT a FROM test WHERE b=4") == []
+
+def test_all_multi_no_result(connection):
+    sql_ = sql.SQL(connection)
+    assert sql_.all("SELECT a, b FROM test WHERE b=4") == []
+
 
 def test_parameterized_all(connection):
     sql_ = sql.SQL(connection)

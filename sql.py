@@ -27,9 +27,12 @@ class SQL(object):
             else:
                 cursor.execute(query)
             Record = self.make_record(cursor)
-            if Record is None:
-                return cursor.fetchone()[0]
-            return Record(*cursor.fetchone())
+            try:
+                if Record is None:
+                    return cursor.fetchone()[0]
+                return Record(*cursor.fetchone())
+            except TypeError:
+                return None
 
     def all(self, query, parameters=None):
         """

@@ -7,7 +7,7 @@ readme = os.path.join(curdir, 'README.rst')
 
 setup(
     name='sql',
-    version='0.3.0',
+    version='0.4.0',
     description='DB API 2.0 for Humans',
     long_description=open(readme).read(),
     author='Eugene Van den Bulke',
