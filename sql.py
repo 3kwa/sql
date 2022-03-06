@@ -5,6 +5,8 @@ working with results a lot simpler.
 http://www.python.org/dev/peps/pep-0249/ for Humans
 """
 
+__version__ = "2022.4.0"
+
 from collections import namedtuple
 from contextlib import closing
 
@@ -58,6 +60,11 @@ class SQL(object):
                 execute(query, parameters)
             else:
                 execute(query)
+        # to make it possible to chain run(...).commit()
+        return self
+
+    def commit(self):
+        self.connection.commit()
 
     @staticmethod
     def make_record(cursor):
@@ -67,10 +74,10 @@ class SQL(object):
         if len(cursor.description) > 1:
             fields = [description[0] for description in cursor.description]
             try:
-                return namedtuple('Record', fields)
+                return namedtuple("Record", fields)
             except ValueError as e:
-                expression = e.args[0].split(':').pop().strip()
-                raise SQLException('Missing AS for %s', expression)
+                expression = e.args[0].split(":").pop().strip()
+                raise SQLException("Missing AS for %s", expression)
 
     @staticmethod
     def which_execute(parameters_or_seq):
@@ -78,15 +85,16 @@ class SQL(object):
         which of execute or executemany
         """
         if not parameters_or_seq:
-            return 'execute'
+            return "execute"
         sequences = (list, tuple)
         types_many = (dict, list, tuple)
         if type(parameters_or_seq) == dict:
-            return 'execute'
+            return "execute"
         if any(type(parameters_or_seq) == type_ for type_ in sequences):
             if any(type(parameters_or_seq[0]) == type_ for type_ in types_many):
-                return 'executemany'
-            return 'execute'
+                return "executemany"
+            return "execute"
+
 
 class SQLException(Exception):
     pass

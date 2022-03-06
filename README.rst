@@ -25,14 +25,31 @@ run
 `run` is the method to use when you want to run a query but do not care about
 the result e.g. to create a table:
 
->>> bliss.run("CREATE TABLE contributors (firstname VARCHAR, lastname VARCHAR)")
+>>> bliss.run("CREATE TABLE contributors (firstname VARCHAR, lastname VARCHAR)") #doctest: +ELLIPSIS
+<sql.SQL object ...>
 >>> bliss.run("INSERT INTO contributors VALUES (?, ?)", [('Andrew', 'Kuchling'),
 ...                                                      ('James', 'Henstridge'),
 ...                                                      ('Daniele', 'Varrazzo'),
-...                                                      ('Marc-Andre', 'Lemburg')])
+...                                                      ('Marc-Andre', 'Lemburg')]) #doctest: +ELLIPSIS
+<sql.SQL object ...>
 
 Nothing impressive so far, creating a cursor and calling executemany would achieve
 the same result.
+
+commit
+------
+
+Added in version `2022.4.0` 
+
+>>> bliss.run("INSERT INTO contributors VALUES (?, ?)", ("Chad", "Whitacre")) #doctest: +ELLIPSIS
+<sql.SQL object ...>
+>>> bliss.commit() 
+
+Just because it is shorter than `bliss.connection.commit()`
+
+`run` returns self so `commit` can be chained
+
+>>> bliss.run("INSERT INTO contributors VALUES (?, ?)", ("Guido", "van Rossum")).commit()
 
 one
 ---
@@ -40,37 +57,34 @@ one
 `one` is the method to use when you know the result is a single row or only care
 about one.
 
->>> bliss.one("SELECT firstname FROM contributors WHERE lastname='Lemburg'") # doctest: +SKIP
-u'Marc-Andre'
+>>> bliss.one("SELECT firstname FROM contributors WHERE lastname='Lemburg'")
+'Marc-Andre'
 
 The string, nothing but the string, which in my book beats:
 
 >>> cursor = connection.cursor()
 >>> cursor.execute("SELECT firstname FROM contributors WHERE lastname='Lemburg'") # doctest: +ELLIPSIS
 <sqlite3.Cursor object at ...>
->>> cursor.fetchone() # doctest: +SKIP
-(u'Marc-Andre',)
+>>> cursor.fetchone()
+('Marc-Andre',)
 
 Even better, if the result contains several column, one returns a namedtuple_:
 
->>> bliss.one("SELECT * FROM contributors WHERE firstname='James'") # doctest: +SKIP
-Record(firstname=u'James', lastname=u'Henstridge')
+>>> bliss.one("SELECT * FROM contributors WHERE firstname='James'")
+Record(firstname='James', lastname='Henstridge')
 
 all
 ---
 
 `all` is the method to use to retrieve all rows from a query.
 
->>> bliss.all("SELECT firstname FROM contributors") #doctest: +SKIP
-[u'Andrew', u'James', u'Daniele', u'Marc-Andre']
+>>> bliss.all("SELECT firstname FROM contributors")
+['Andrew', 'James', 'Daniele', 'Marc-Andre', 'Chad', 'Guido']
 
 It returns a list of namedtuples when appropriate:
 
->>> bliss.all("SELECT firstname, LENGTH(lastname) AS length FROM contributors") # doctest: +NORMALIZE_WHITESPACE +SKIP
-[Record(firstname=u'Andrew', length=8),
- Record(firstname=u'James', length=10),
- Record(firstname=u'Daniele', length=8),
- Record(firstname=u'Marc-Andre', length=7)]
+>>> bliss.all("SELECT firstname, LENGTH(lastname) AS length FROM contributors")
+[Record(firstname='Andrew', length=8), Record(firstname='James', length=10), Record(firstname='Daniele', length=8), Record(firstname='Marc-Andre', length=7), Record(firstname='Chad', length=8), Record(firstname='Guido', length=10)]
 
 .. _DB API 2.0: http://www.python.org/dev/peps/pep-0249/
 .. _postgres: https://postgres-py.readthedocs.org/en/latest/
